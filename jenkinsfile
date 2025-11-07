@@ -1,0 +1,49 @@
+pipeline {
+   agent any
+     environment {
+       TF_VAR_aws_region = 'us-east-2'
+       AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+       AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+       }
+
+     stages {
+       stage('Checkout') {
+         steps {
+           // Checkout the Git repository containing the Terraform code
+           git branch: 'main', url: 'https://github.com/lernwithshubham/terraform-demo.git'
+         }
+       }
+       stage('Terraform Init') {
+         steps {
+           script {
+             // Initialize Terraform to download required providers
+             sh 'terraform init'
+           }
+         }
+       }
+       stage('Terraform Plan') {
+         steps {
+           script {
+             // Generate the Terraform execution plan
+             sh 'terraform plan'
+           }
+         }
+       }
+       stage('Terraform Apply') {
+         steps {
+           script {
+             // Apply the Terraform plan and deploy infrastructure
+             sh 'terraform apply -auto-approve'
+           }
+         }
+       }
+       stage('Terraform Destroy') {
+         steps {
+           script {
+             // Optional cleanup: destroy infrastructure
+             sh 'terraform destroy -auto-approve'
+           }
+         }
+       }
+     }
+ }
